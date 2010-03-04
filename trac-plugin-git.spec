@@ -3,13 +3,13 @@
 Summary:	GIT version control plugin for Trac %{trac_ver}
 Name:		trac-plugin-git
 Version:	%{trac_ver}.0.2
-Release:	0.3
+Release:	1
 License:	GPL v2
 Group:		Applications/WWW
 # Source0Download:	http://trac-hacks.org/changeset/latest/gitplugin?old_path=/&filename=gitplugin&format=zip
 Source0:	%{plugin}.zip
 # Source0-md5:	b4d3ae110223606a46a1c7a413e8994d
-Patch0:		http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?format=raw
+Patch0:		trac-git-plugin-python2.4.patch
 URL:		http://trac-hacks.org/wiki/GitPlugin
 BuildRequires:	python-devel >= 1:2.4
 Requires:	trac >= %{trac_ver}
