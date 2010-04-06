@@ -12,6 +12,10 @@ Source0:	%{plugin}.zip
 Patch0:		trac-git-plugin-python2.4.patch
 URL:		http://trac-hacks.org/wiki/GitPlugin
 BuildRequires:	python-devel >= 1:2.4
+BuildRequires:	python-distribute
+BuildRequires:	python-modules
+BuildRequires:	rpm-pythonprov
+BuildRequires:	unzip
 Requires:	trac >= %{trac_ver}
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
