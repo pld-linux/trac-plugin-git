@@ -1,8 +1,8 @@
 from http://trac-hacks.org/ticket/6402
 http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?format=raw
 
---- trac-plugin-git-0.12.0.5/tracext/git/git_fs.py~	2011-01-31 17:25:43.000000000 +0200
-+++ trac-plugin-git-0.12.0.5/tracext/git/git_fs.py	2011-01-31 17:26:46.305667522 +0200
+--- trac-plugin-git-0.12.0.5/tracext/git/git_fs.py	2010-10-17 19:43:21.000000000 +0300
++++ trac-plugin-git-0.12.0.5/tracext/git/git_fs.py	2011-01-31 17:35:59.535312000 +0200
 @@ -29,8 +29,8 @@
  from datetime import datetime
  import sys
@@ -27,8 +27,8 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
  
      def get_last_modified(self):
          if not self.isfile:
---- trac-plugin-git-0.12.0.5/tracext/git/PyGIT.py~	2011-01-31 17:25:43.000000000 +0200
-+++ trac-plugin-git-0.12.0.5/tracext/git/PyGIT.py	2011-01-31 17:30:07.310680747 +0200
+--- trac-plugin-git-0.12.0.5/tracext/git/PyGIT.py	2010-10-17 19:43:21.000000000 +0300
++++ trac-plugin-git-0.12.0.5/tracext/git/PyGIT.py	2011-01-31 17:35:59.535312000 +0200
 @@ -12,11 +12,9 @@
  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  # GNU General Public License for more details.
@@ -40,8 +40,8 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
 -from functools import partial
  from threading import Lock
  from subprocess import Popen, PIPE
- import cStringIO
-@@ -24,6 +22,24 @@
+ from operator import itemgetter
+@@ -25,6 +23,24 @@
  
  __all__ = ["git_version", "GitError", "GitErrorSha", "Storage", "StorageFactory"]
  
@@ -66,7 +66,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
  class GitError(Exception):
      pass
  
-@@ -64,7 +80,7 @@
+@@ -69,7 +85,7 @@
          return stdout_data
  
      def __getattr__(self, name):
@@ -75,7 +75,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
  
      __is_sha_pat = re.compile(r'[0-9A-Fa-f]*$')
  
-@@ -86,7 +102,8 @@
+@@ -98,7 +114,8 @@
          self.__lock = Lock()
  
      def __setitem__(self, name, value):
@@ -85,8 +85,8 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
              assert len(self) == len(self.__key_fifo) # invariant
  
              if not self.__contains__(name):
-@@ -113,7 +133,8 @@
-     def __init__(self, repo, log, weak=True, git_bin='git'):
+@@ -124,7 +141,8 @@
+     def __init__(self, repo, log, weak=True, git_bin='git', git_fs_encoding=None):
          self.logger = log
  
 -        with StorageFactory.__dict_lock:
@@ -95,8 +95,8 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
              try:
                  i = StorageFactory.__dict[repo]
              except KeyError:
-@@ -183,7 +206,7 @@
-         self.logger = log
+@@ -273,7 +291,7 @@
+             self._fs_to_unicode = self._fs_from_unicode = lambda s: s
  
          # simple sanity checking
 -        __git_file_path = partial(os.path.join, git_dir)
@@ -104,7 +104,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
          if not all(map(os.path.exists,
                         map(__git_file_path,
                             ['HEAD','objects','refs']))):
-@@ -328,7 +331,8 @@
+@@ -308,7 +326,8 @@
      def __rev_cache_sync(self, youngest_rev=None):
          "invalidates revision db cache if necessary"
  
@@ -114,7 +114,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
              need_update = False
              if self.__rev_cache:
                  last_youngest_rev = self.__rev_cache.youngest_rev
-@@ -343,6 +347,9 @@
+@@ -323,6 +342,9 @@
  
              return need_update
  
@@ -124,7 +124,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
      def get_rev_cache(self):
          """
          Retrieve revision cache
-@@ -352,7 +359,8 @@
+@@ -332,7 +354,8 @@
          returns RevCache tupel
          """
  
@@ -134,8 +134,8 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
              if self.__rev_cache is None: # can be cleared by Storage.__rev_cache_sync()
                  self.logger.debug("triggered rebuild of commit tree db for %d" % id(self))
                  ts0 = time.time()
-@@ -312,7 +340,10 @@
-                 new_db = tmp
+@@ -410,7 +433,10 @@
+                 __rev_seen = None
  
                  # convert sdb either to dict or array depending on size
 -                tmp = [()]*(max(new_sdb.keys())+1) if len(new_sdb) > 5000 else {}
@@ -146,7 +146,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
  
                  try:
                      while True:
-@@ -331,7 +362,10 @@
+@@ -431,7 +457,10 @@
              assert all(e is not None for e in self.__rev_cache) or not any(self.__rev_cache)
  
              return self.__rev_cache
@@ -156,10 +156,10 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
 +        finally:
 +            self.__rev_cache_lock.release()
  
-     # tuple: youngest_rev, oldest_rev, rev_dict, tag_dict, short_rev_dict
+     # see RevCache namedtupel
      rev_cache = property(get_rev_cache)
-@@ -512,7 +546,8 @@
-             self.logger.info("read_commit failed for '%s'" % commit_id)
+@@ -643,7 +672,8 @@
+                              (commit_id, commit_id_orig))
              raise GitErrorSha
  
 -        with self.__commit_msg_lock:
@@ -168,7 +168,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
              if self.__commit_msg_cache.has_key(commit_id):
                  # cache hit
                  result = self.__commit_msg_cache[commit_id]
-@@ -539,6 +574,9 @@
+@@ -670,6 +700,9 @@
  
              return result[0], dict(result[1])
  
@@ -178,7 +178,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
      def get_file(self, sha):
          return cStringIO.StringIO(self.repo.cat_file("blob", str(sha)))
  
-@@ -650,8 +688,11 @@
+@@ -796,8 +829,11 @@
          diff_tree_args = ["-z", "-r"]
          if find_renames:
              diff_tree_args.append("-M")
@@ -192,7 +192,7 @@ http://trac-hacks.org/attachment/ticket/6402/trac-git-plugin-python2.4.patch?for
                                 "--", path])
  
          lines = self.repo.diff_tree(*diff_tree_args).split('\0')
-@@ -992,7 +1000,10 @@
+@@ -959,7 +995,10 @@
          rev = g.head()
          for mode, _type, sha, _size, name in g.ls_tree(rev):
              [last_rev] = g.history(rev, name, limit=1)
