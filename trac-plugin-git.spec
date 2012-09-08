@@ -3,13 +3,12 @@
 Summary:	GIT version control plugin for Trac
 Name:		trac-plugin-git
 Version:	%{trac_ver}.0.5
-Release:	1
-License:	GPL v2
+Release:	2
+License:	BSD
 Group:		Applications/WWW
-#Source0:	http://trac-hacks.org/changeset/latest/gitplugin?old_path=/&format=zip#/%{plugin}-%{version}.zip
-# TH site is down at this moment, so use fedora mirror
-Source0:	http://pkgs.fedoraproject.org/repo/pkgs/trac-git-plugin/TracGit-%{version}dev.tar.gz/b5e624f7c0f3a85240e0f1484492dc15/TracGit-%{version}dev.tar.gz
-# Source0-md5:	b5e624f7c0f3a85240e0f1484492dc15
+#Source0:	https://github.com/hvr/trac-git-plugin/tarball/v%{version}/%{name}-%{version}.tgz
+Source0:	https://github.com/hvr/trac-git-plugin/tarball/master/%{name}-%{version}.tgz
+# Source0-md5:	897291bbbbc8d9a830a2def7f63acf76
 Patch0:		trac-git-plugin-python2.4.patch
 URL:		http://trac-hacks.org/wiki/GitPlugin
 BuildRequires:	python-devel >= 1:2.4
@@ -40,7 +39,8 @@ Features:
   checksums
 
 %prep
-%setup -qn TracGit-%{version}dev
+%setup -qc
+mv *-trac-git-plugin-*/* .
 %if "%{py_ver}" < "2.5"
 %patch0 -p1
 %endif
