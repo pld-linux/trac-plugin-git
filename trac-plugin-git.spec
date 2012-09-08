@@ -48,6 +48,7 @@ mv *-trac-git-plugin-*/* .
 %build
 %{__python} setup.py build
 %{__python} setup.py egg_info
+%py_lint tracext
 
 %install
 rm -rf $RPM_BUILD_ROOT
