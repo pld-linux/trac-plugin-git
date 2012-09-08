@@ -18,11 +18,26 @@ BuildRequires:	python-modules
 BuildRequires:	rpm-pythonprov
 BuildRequires:	unzip
 Requires:	trac >= %{trac_ver}
+# included in trac 0.13+ (trac 1.0)
+Conflicts:	trac >= 0.13
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 This Trac plugin provides support for the GIT SCM.
+
+Features:
+- Browsing source code in a Git repository via the TracBrowser
+- Viewing the change history of a file or directory using
+  TracRevisionLog
+- Performing diffs between any two files or two directories
+- Displaying submitted changes in the TracTimeline
+- (Optionally) caching TracChangeset information in Trac's database
+- Caching Git commit relation graph in memory
+- Using the TracSearch page to search change descriptions
+- Annotation support, also known as "blame" operation
+- Interpretation of 40-character wide hex-strings as sha1 commit
+  checksums
 
 %prep
 %setup -qn TracGit-%{version}dev
