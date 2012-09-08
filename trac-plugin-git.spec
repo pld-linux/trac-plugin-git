@@ -16,6 +16,7 @@ BuildRequires:	python-distribute
 BuildRequires:	python-modules
 BuildRequires:	rpm-pythonprov
 BuildRequires:	unzip
+Requires:	git-core >= 1.5.6
 Requires:	trac >= %{trac_ver}
 # included in trac 0.13+ (trac 1.0)
 Conflicts:	trac >= 0.13
